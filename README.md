@@ -1,287 +1,567 @@
-# Roblox Game Systems - Portfolio
+# AI Document Assistant
 
-Colección de sistemas que hice para Roblox. Incluye inventario, combate, skills, guardado de datos, quests y más. Todo modular y listo para usar.
+> A production-grade, AI-powered document Q&A system using Retrieval-Augmented Generation (RAG)
 
-## 🎮 Características
+[![Java](https://img.shields.io/badge/Java-17-orange.svg)](https://www.oracle.com/java/)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.1-brightgreen.svg)](https://spring.io/projects/spring-boot)
+[![React](https://img.shields.io/badge/React-18-blue.svg)](https://reactjs.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-14-black.svg)](https://nextjs.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue.svg)](https://www.postgresql.org/)
+[![AWS](https://img.shields.io/badge/AWS-Deployed-orange.svg)](https://aws.amazon.com/)
 
-### Sistemas Implementados
+## 📋 Table of Contents
 
-- **DataManager** - Sistema de persistencia con DataStores, autosave y manejo de errores robusto
-- **InventoryModule** - Inventario modular con slots, stacking, categorías y operaciones de items
-- **CombatModule** - Sistema de combate con daño, críticos, combos, knockback y cooldowns
-- **SkillsModule** - Habilidades activables con costos de recursos, cooldowns y progresión
-- **QuestModule** - Sistema de misiones con múltiples objetivos, tracking y recompensas
-- **ShopModule** - Tienda con compra/venta, múltiples monedas y sistema de descuentos
-- **EventsManager** - Gestión de RemoteEvents con rate limiting y validación server-side
-- **ParticlesManager** ⭐ - VFX avanzado con object pooling, presets y auto-cleanup
-- **NetworkModule** ⭐ - Comunicación red con rate limiting, retry logic y type validation
-- **SpawnManager** ⭐ - Sistema de oleadas con dificultad dinámica, boss spawns y balanceo
-- **AchievementManager** ⭐ - Logros con badges de Roblox, tracking persistente y recompensas automáticas
+- [Overview](#overview)
+- [Features](#features)
+- [Architecture](#architecture)
+- [Tech Stack](#tech-stack)
+- [Getting Started](#getting-started)
+- [Deployment](#deployment)
+- [AI Design Choices](#ai-design-choices)
+- [Security](#security)
+- [Cost Estimation](#cost-estimation)
+- [Documentation](#documentation)
+- [License](#license)
 
-## 📁 Estructura del Proyecto
+## 🎯 Overview
+
+AI Document Assistant allows users to upload documents (PDF, TXT, DOCX) and ask questions about their content. The system uses OpenAI's GPT-4 with Retrieval-Augmented Generation (RAG) to provide accurate, context-aware answers backed by the actual document content.
+
+**Key Capabilities:**
+- Upload and process documents with automatic text extraction
+- Ask questions in natural language
+- Get AI-powered answers with source citations
+- Stream responses in real-time
+- Maintain conversation history
+- Track usage and costs
+
+## ✨ Features
+
+### Core Features
+- ✅ **Document Upload & Processing**: PDF, TXT, DOCX support with automatic chunking
+- ✅ **AI-Powered Q&A**: GPT-4 integration with RAG pattern
+- ✅ **Real-time Streaming**: Server-Sent Events for token-by-token responses
+- ✅ **Conversation Management**: Persistent chat history with context
+- ✅ **User Authentication**: JWT-based secure authentication
+- ✅ **Document Management**: Upload, view, delete documents
+
+### AI-Specific Features
+- ✅ **Provider Abstraction**: Easy switching between OpenAI, Anthropic, etc.
+- ✅ **Prompt Versioning**: Version-controlled prompt templates
+- ✅ **Vector Search**: pgvector for semantic similarity search
+- ✅ **Input Sanitization**: Prompt injection prevention
+- ✅ **Cost Tracking**: Token usage and cost monitoring
+- ✅ **Rate Limiting**: Per-user request throttling
+
+### Production Features
+- ✅ **Infrastructure as Code**: Complete Terraform setup for AWS
+- ✅ **Container Deployment**: Docker + ECS Fargate
+- ✅ **Auto-scaling**: CPU-based horizontal scaling
+- ✅ **Monitoring**: CloudWatch logs and metrics
+- ✅ **Secrets Management**: AWS Secrets Manager integration
+- ✅ **High Availability**: Multi-AZ deployment (production)
+
+## 🏗️ Architecture
+
+A production-ready AI-powered full-stack application that enables users to upload documents and interact with an AI assistant to ask questions about their content using Retrieval-Augmented Generation (RAG).
+
+## Architecture Overview
+
+### Technology Stack
+
+**Backend:**
+- Java 17 with Spring Boot 3.2
+- PostgreSQL for structured data
+- Vector store integration for embeddings (pgvector)
+- JWT authentication
+- OpenAPI/Swagger documentation
+
+**Frontend:**
+- React with Next.js 14
+- TypeScript
+- Tailwind CSS for styling
+- React Query for data fetching
+
+**Infrastructure:**
+- AWS (ECS, RDS, S3, Secrets Manager)
+- Terraform for IaC
+- Docker containerization
+
+### Key Features
+
+1. **Document Management**
+   - Upload documents (PDF, TXT, DOCX)
+   - Store in S3 with metadata in PostgreSQL
+   - Automatic text extraction and chunking
+
+2. **AI-Powered Q&A**
+   - RAG-based question answering
+   - Context-aware responses
+   - Streaming responses for better UX
+   - Conversation history tracking
+
+3. **Security**
+   - JWT-based authentication
+   - Input sanitization and validation
+   - Prompt injection prevention
+   - Rate limiting per user
+
+4. **Production-Ready**
+   - Comprehensive error handling
+   - Logging and auditability
+   - Cost tracking and monitoring
+   - Scalable architecture
+
+## AI Design Decisions
+
+### 1. Provider Abstraction
+The AI service layer abstracts LLM providers through the `AIProvider` interface, allowing seamless switching between OpenAI, Anthropic, AWS Bedrock, or others without changing business logic.
+
+### 2. Prompt Management
+- Prompts are versioned and stored separately from code
+- Template-based system with variable substitution
+- Version tracking for A/B testing and rollback
+
+### 3. Security Measures
+- Input sanitization before prompt construction
+- Maximum token limits to prevent abuse
+- Content filtering for harmful requests
+- Audit logging of all AI interactions
+
+### 4. Cost Control
+- Token counting before API calls
+- Per-user rate limiting (configurable)
+- Caching of common queries
+- Budget alerts via CloudWatch
+
+### 5. RAG Implementation
+- Documents chunked into semantic segments
+- Embeddings stored in pgvector
+- Similarity search for relevant context
+- Reranking for optimal results
+
+## Project Structure
 
 ```
-src/
-├── ServerScriptService/
-│   ├── DataManager.lua              # Persistencia de datos con DataStore
-│   ├── EventsManager.lua            # Gestión de RemoteEvents
-│   ├── LeaderboardManager.lua       # Sistema de rankings
-│   ├── ServerInit.lua               # Inicialización del servidor
-│   ├── SpawnManager.lua             # ⭐ Sistema de oleadas y spawns
-│   └── AchievementManager.lua       # ⭐ Sistema de logros y badges
-│
-├── ReplicatedStorage/
-│   └── Modules/
-│       ├── InventoryModule.lua      # Sistema de inventario
-│       ├── CombatModule.lua         # Sistema de combate
-│       ├── SkillsModule.lua         # Sistema de habilidades
-│       ├── QuestModule.lua          # Sistema de misiones
-│       ├── ShopModule.lua           # Sistema de tienda
-│       ├── UtilityModule.lua        # Funciones helper
-│       ├── ParticlesManager.lua     # ⭐ Sistema de efectos visuales
-│       └── NetworkModule.lua        # ⭐ Comunicación cliente-servidor
-│
-└── StarterPlayer/
-    └── StarterPlayerScripts/
-        ├── ClientInventoryHandler.lua  # Cliente inventario
-        └── ClientCombatHandler.lua     # Cliente combate
+.
+├── backend/                    # Spring Boot application
+│   ├── src/main/java/com/aiassistant/
+│   │   ├── config/            # Configuration classes
+│   │   ├── controller/        # REST API controllers
+│   │   ├── service/           # Business logic
+│   │   │   ├── ai/           # AI service abstraction
+│   │   │   ├── document/     # Document processing
+│   │   │   └── auth/         # Authentication
+│   │   ├── repository/        # Data access layer
+│   │   ├── model/            # Domain models
+│   │   ├── dto/              # Data transfer objects
+│   │   └── security/         # Security configuration
+│   ├── src/main/resources/
+│   │   ├── prompts/          # Prompt templates
+│   │   └── application.yml    # Configuration
+│   └── Dockerfile
+├── frontend/                   # Next.js application
+│   ├── src/
+│   │   ├── app/              # App router pages
+│   │   ├── components/       # React components
+│   │   ├── hooks/            # Custom hooks
+│   │   ├── lib/              # Utilities
+│   │   └── types/            # TypeScript types
+│   ├── public/
+│   └── Dockerfile
+├── infrastructure/             # Terraform IaC
+│   ├── modules/
+│   │   ├── networking/
+│   │   ├── compute/
+│   │   ├── database/
+│   │   └── storage/
+│   └── environments/
+│       ├── dev/
+│       └── prod/
+└── docs/                      # Documentation
+    ├── ARCHITECTURE.md
+    ├── AI_DESIGN.md
+    ├── DEPLOYMENT.md
+    └── API.md
 ```
 
-## 🚀 Uso Rápido
+## Local Development Setup
 
-### DataManager
+### Prerequisites
+- Java 17+
+- Node.js 18+
+- Docker and Docker Compose
+- PostgreSQL 15+ (or use Docker)
+- AWS CLI (for deployment)
 
-```lua
-local DataManager = require(ServerScriptService.DataManager)
+### Environment Variables
 
--- Inicializar sistema
-DataManager:Initialize()
+Create `.env` files in backend and frontend directories:
 
--- Obtener datos de un jugador
-local data = DataManager:GetData(player)
+**Backend (.env):**
+```env
+# Database
+DATABASE_URL=jdbc:postgresql://localhost:5432/aiassistant
+DATABASE_USERNAME=postgres
+DATABASE_PASSWORD=your_password
 
--- Actualizar valor
-DataManager:UpdateValue(player, "Coins", 100)
+# AI Provider
+AI_PROVIDER=openai
+OPENAI_API_KEY=sk-your-key-here
 
--- Incrementar valor
-DataManager:IncrementValue(player, "Experience", 50)
+# JWT
+JWT_SECRET=your-secret-key-here
+JWT_EXPIRATION=86400000
+
+# AWS (for production)
+AWS_REGION=us-east-1
+AWS_S3_BUCKET=ai-assistant-documents
 ```
 
-### InventoryModule
-
-```lua
-local InventoryModule = require(ReplicatedStorage.Modules.InventoryModule)
-
--- Crear inventario
-local inventory = InventoryModule.new({ MaxSlots = 20 })
-
--- Añadir items
-inventory:AddItem("health_potion", 5)
-inventory:AddItem("iron_sword", 1)
-
--- Verificar si tiene item
-local hasItem, count = inventory:HasItem("health_potion", 3)
-
--- Mover items entre slots
-inventory:MoveItem(1, 5)
-
--- Exportar datos
-local data = inventory:ExportData()
+**Frontend (.env.local):**
+```env
+NEXT_PUBLIC_API_URL=http://localhost:8080/api
 ```
 
-### CombatModule
+### Running with Docker Compose
 
-```lua
-local CombatModule = require(ReplicatedStorage.Modules.CombatModule)
+```bash
+# Start all services
+docker-compose up -d
 
--- Ataque melee
-local success, message, info = CombatModule:MeleeAttack(
-    attacker,
-    target,
-    weapon,
-    1  -- cooldown
-)
+# View logs
+docker-compose logs -f
 
--- Calcular daño
-local damage, damageInfo = CombatModule:CalculateDamage(
-    attacker,
-    target,
-    baseDamage
-)
-
--- Aplicar daño
-CombatModule:ApplyDamage(target, damage, attacker, {
-    Knockback = true,
-    KnockbackForce = 50
-})
+# Stop services
+docker-compose down
 ```
 
-### SkillsModule
+### Running Manually
 
-```lua
-local SkillsModule = require(ReplicatedStorage.Modules.SkillsModule)
-
--- Crear instancia
-local skills = SkillsModule.new()
-
--- Inicializar skills del jugador
-skills:InitializePlayerSkills(player.UserId, savedData)
-
--- Activar skill
-local success, message, info = skills:ActivateSkill(
-    player,
-    "fireball",
-    targetData
-)
-
--- Verificar cooldown
-local onCooldown, remaining = skills:IsOnCooldown(player.UserId, "fireball")
+**Backend:**
+```bash
+cd backend
+./mvnw spring-boot:run
 ```
 
-### EventsManager
-
-```lua
-local EventsManager = require(ServerScriptService.EventsManager)
-
--- Inicializar
-EventsManager:Initialize()
-
--- Crear RemoteEvent
-EventsManager:CreateEvent("PlayerAttack", function(player, target)
-    -- Lógica del evento
-end)
-
--- Crear RemoteFunction
-EventsManager:CreateFunction("GetPlayerData", function(player)
-    return { Success = true, Data = data }
-end)
-
--- Enviar a cliente
-EventsManager:FireClient("UpdateUI", player, uiData)
-
--- Enviar a todos
-EventsManager:FireAllClients("GameEvent", eventData)
+**Frontend:**
+```bash
+cd frontend
+npm install
+npm run dev
 ```
 
-## 🛡️ Seguridad
-
-- **Rate Limiting** - Para que no spameen eventos
-- **Validación de distancia** - Anti-exploit en combate (no puedes pegar desde 1000 studs)
-- **Manejo de errores** - PCalls en todo lo importante
-- **Reintentos automáticos** - Si falla el DataStore, reintenta
-- **Validación** - El servidor valida todo, no confío en el cliente
-
-## 📊 Sistema de Data Persistence
-
-El `DataManager` incluye:
-
-- ✅ Autosave cada 3 minutos
-- ✅ Guardado al salir del juego
-- ✅ Guardado antes del cierre del servidor
-- ✅ Sistema de reintentos con backoff
-- ✅ Merge automático con template de datos
-- ✅ Cache en memoria para acceso rápido
-
-## 🎯 Sistema de Combat
-
-Características del sistema de combate:
-
-- Daño base + stats del jugador
-- Sistema de defensa con reducción porcentual
-- Críticos (15% chance, 1.5x multiplicador)
-- Sistema de combos con bonificación
-- Cooldowns por entidad
-- Knockback configurable
-- Stun temporal
-- DOT (Damage Over Time)
-
-## ⚡ Sistema de Skills
-
-Skills implementados:
-
-- **Fireball** - Proyectil de daño
-- **Heal** - Curación
-- **Dash** - Movimiento rápido
-- **Shield** - Escudo temporal
-- **Area Attack** - Daño en área
-
-Cada skill incluye:
-- Cooldown individual
-- Costo de recursos (Mana/Stamina)
-- Sistema de niveles (1-10)
-- Bonuses por nivel
-- Experiencia y progresión
-
-## 📝 Sistema de Quests
-
-- Tipos de objetivos: Kill, Collect, Distance, UseSkill
-- Sistema de recompensas (Coins, XP, Items)
-- Tracking automático de progreso
-- Quests con requisitos de nivel
-- Auto-accept para quests de tutorial
-
-## 💰 Sistema de Shop
-
-- Compra y venta de items
-- Múltiples tipos de moneda
-- Sistema de descuentos
-- Stock configurable (finito o infinito)
-- Categorías de items
-- Precio de venta al 50% del precio de compra
-
-## 🔧 Configuración
-
-Cada módulo tiene una sección `CONFIG` al inicio para ajustar parámetros:
-
-```lua
-local CONFIG = {
-    DataStoreName = "PlayerData_v1",
-    AutoSaveInterval = 180,
-    MaxRetries = 3
-}
+**Database:**
+```bash
+# Using Docker
+docker run -d \
+  --name postgres-ai \
+  -e POSTGRES_DB=aiassistant \
+  -e POSTGRES_PASSWORD=postgres \
+  -p 5432:5432 \
+  pgvector/pgvector:pg15
 ```
 
-## 📈 Optimización
+## API Documentation
 
-- Cacheo de datos en memoria para acceso rápido
-- Limpieza automática de cooldowns viejos
-- Task.spawn para no bloquear el thread principal
-- Rate limiting para evitar spam
-- Validaciones rápidas antes de procesar
+Once running, access Swagger UI at: `http://localhost:8080/swagger-ui.html`
 
-## 🤝 Sobre el Proyecto
+### Key Endpoints
 
-Portfolio personal que muestra lo que sé hacer:
-- Sistemas modulares en Lua/Roblox
-- Código escalable y organizado
-- Seguridad y prevención de exploits
-- Guardado de datos con DataStore
-- RemoteEvents y comunicación cliente-servidor
-- Optimización y código limpio
+**Authentication:**
+- `POST /api/auth/register` - Register new user
+- `POST /api/auth/login` - Login and get JWT token
 
-## 📚 Más Info
+**Documents:**
+- `POST /api/documents/upload` - Upload a document
+- `GET /api/documents` - List user's documents
+- `GET /api/documents/{id}` - Get document details
+- `DELETE /api/documents/{id}` - Delete document
 
-Si quieres ver más ejemplos:
-- **[EXAMPLES.md](EXAMPLES.md)** - Ejemplos de cómo usar cada módulo
+**AI Assistant:**
+- `POST /api/ai/ask` - Ask question about documents
+- `GET /api/ai/conversations` - Get conversation history
+- `GET /api/ai/stream` - Server-Sent Events for streaming
 
-## 🌟 Lo Más Destacado
+## Data & Privacy
 
-### ParticlesManager - VFX Optimizado
-Sistema de efectos visuales que usa object pooling para no lagear. Incluye presets y limpieza automática.
+### Data Storage
 
-### SpawnManager - Oleadas Dinámicas
-Spawneo de enemigos que se adapta automáticamente a la cantidad de jugadores y oleada actual. Incluye sistema de boss cada 10 oleadas.
+**What We Store:**
+- User credentials (hashed)
+- Document metadata (filename, size, upload date)
+- Document embeddings (vectors)
+- Conversation history (questions and answers)
+- Usage metrics (tokens, cost per request)
 
-### AchievementManager - Logros
-Sistema completo de logros con integración de badges de Roblox. Se guarda automáticamente en DataStore y da recompensas.
+**What We Don't Store:**
+- Raw AI API responses (only processed outputs)
+- Temporary processing data
+- User session data beyond JWT
 
-### NetworkModule - Comunicación Segura
-Wrapper sobre RemoteEvents con rate limiting automático y validación de tipos. Previene exploits y spam.
+### Data Retention
 
-## 📄 Licencia
+- Documents: Until user deletion
+- Conversations: 90 days (configurable)
+- Audit logs: 1 year
+- Metrics: 30 days detailed, 1 year aggregated
 
-Código de portfolio - Libre para uso educativo
+### PII Handling
 
----
+1. **Detection:** Regex-based PII detection before AI processing
+2. **Redaction:** Automatic masking of sensitive data
+3. **Logging:** PII excluded from logs
+4. **Compliance:** GDPR-ready with data export/deletion
 
-**Hecho por 4GP** | 1 año y medio programando en Roblox
+### Auditability
+
+All AI interactions logged with:
+- User ID
+- Timestamp
+- Input hash (not raw content)
+- Model and version used
+- Token count and cost
+- Response time
+
+## AI Evaluation & Reliability
+
+### Quality Measurement
+
+1. **Automated Metrics:**
+   - Response relevance score (cosine similarity)
+   - Answer completeness (keyword coverage)
+   - Response time tracking
+   - Token efficiency ratio
+
+2. **Human Evaluation:**
+   - Thumbs up/down feedback
+   - Report incorrect answers
+   - User satisfaction surveys
+
+### Regression Detection
+
+1. **Prompt Versioning:**
+   - Each prompt change gets a version tag
+   - A/B testing framework included
+   - Automatic rollback on quality degradation
+
+2. **Monitoring:**
+   - Quality metrics tracked per prompt version
+   - Alerts on >10% quality drop
+   - Daily summary reports
+
+3. **Testing:**
+   - Golden dataset for regression testing
+   - Automated evaluation on prompt changes
+   - Compare outputs across versions
+
+### Handling Wrong Answers
+
+**Prevention:**
+- Include confidence scores in responses
+- "I don't know" threshold tuning
+- Cite sources from documents
+
+**Detection:**
+- User feedback collection
+- Anomaly detection on metrics
+- Periodic human review
+
+**Response:**
+1. Flag for review
+2. Add to test dataset
+3. Adjust prompts/parameters
+4. Notify affected users if critical
+
+## Infrastructure & Deployment
+
+### AWS Architecture
+
+```
+Internet
+    |
+    v
+[CloudFront] --> [S3 Static Frontend]
+    |
+    v
+[Application Load Balancer]
+    |
+    v
+[ECS Fargate Cluster]
+    |
+    +-- [Backend Tasks] --> [RDS PostgreSQL]
+    |                   --> [S3 Documents]
+    |                   --> [Secrets Manager]
+    |                   --> [CloudWatch]
+    |
+    v
+[OpenAI API / AWS Bedrock]
+```
+
+### Secret Management
+
+**Development:**
+- Local `.env` files (gitignored)
+- Docker secrets for compose
+
+**Production:**
+- AWS Secrets Manager for API keys
+- IAM roles for service authentication
+- Automatic rotation for DB credentials
+- KMS encryption at rest
+
+**Key Rotation:**
+1. Store new key in Secrets Manager
+2. Update without downtime (dual-key support)
+3. Monitor for usage of old key
+4. Deprecate old key after 24h
+
+### Scaling Strategy
+
+**API Scaling:**
+- ECS auto-scaling based on CPU/memory
+- Target: 70% utilization
+- Min: 2 tasks, Max: 20 tasks
+
+**AI Workload Specific:**
+- Separate task definition for AI endpoints
+- Higher memory allocation (2GB vs 512MB)
+- Longer timeout (60s vs 30s)
+- Queue-based async processing for heavy tasks
+
+**Database:**
+- RDS with read replicas
+- Connection pooling (HikariCP)
+- pgvector index optimization
+
+**Bursty Traffic:**
+- SQS queue for non-urgent AI tasks
+- Lambda for document preprocessing
+- CloudFront caching for static content
+
+## Deployment Instructions
+
+### Terraform Setup
+
+```bash
+cd infrastructure/environments/dev
+
+# Initialize Terraform
+terraform init
+
+# Review plan
+terraform plan
+
+# Apply infrastructure
+terraform apply
+
+# Get outputs
+terraform output
+```
+
+### Docker Deployment
+
+```bash
+# Build images
+docker build -t ai-assistant-backend ./backend
+docker build -t ai-assistant-frontend ./frontend
+
+# Tag for ECR
+docker tag ai-assistant-backend:latest \
+  123456789.dkr.ecr.us-east-1.amazonaws.com/ai-assistant-backend:latest
+
+# Push to ECR
+aws ecr get-login-password --region us-east-1 | \
+  docker login --username AWS --password-stdin \
+  123456789.dkr.ecr.us-east-1.amazonaws.com
+
+docker push 123456789.dkr.ecr.us-east-1.amazonaws.com/ai-assistant-backend:latest
+```
+
+## Cost Estimation
+
+### Per Request Breakdown
+
+**Small Document Query (1K tokens):**
+- OpenAI GPT-4: $0.03
+- Anthropic Claude: $0.024
+- AWS Bedrock: $0.012
+
+**Average Costs:**
+- 1K requests/month: $30-50
+- 10K requests/month: $300-500
+- 100K requests/month: $3,000-5,000
+
+**Infrastructure (AWS):**
+- ECS: ~$50/month (2 tasks)
+- RDS: ~$100/month (db.t3.medium)
+- S3: ~$10/month (100GB)
+- Data transfer: ~$20/month
+
+**Total Monthly Cost:**
+- 1K users: ~$200-300
+- 10K users: ~$600-800
+- 100K users: ~$3,500-5,500
+
+### Optimization Strategies
+
+1. Semantic caching (30% reduction)
+2. Cheaper models for simple queries
+3. Batch processing
+4. Response streaming (better UX, same cost)
+
+## Trade-offs & Limitations
+
+### Current Limitations
+
+1. **Document Size:** Max 10MB per document
+2. **Concurrent Users:** Optimized for <1000 simultaneous
+3. **Languages:** Primarily English (expandable)
+4. **File Types:** PDF, TXT, DOCX only
+
+### Design Trade-offs
+
+1. **PostgreSQL with pgvector vs Dedicated Vector DB:**
+   - Chosen: PostgreSQL (simpler ops, good enough for <1M docs)
+   - Trade-off: Slightly slower for huge scale
+
+2. **Synchronous vs Async AI Calls:**
+   - Chosen: Sync with streaming (better UX)
+   - Trade-off: Higher memory per request
+
+3. **Monorepo vs Separate Repos:**
+   - Chosen: Monorepo (easier to maintain for small team)
+   - Trade-off: Larger CI/CD pipelines
+
+4. **Spring Boot vs Node.js:**
+   - Chosen: Spring Boot (better for enterprise, type safety)
+   - Trade-off: Higher memory footprint
+
+### Known Issues
+
+- Vector similarity search needs optimization for >100K documents
+- No multi-tenancy isolation (single database)
+- Rate limiting is per-user, not per-organization
+
+## Testing
+
+```bash
+# Backend tests
+cd backend
+./mvnw test
+
+# Frontend tests
+cd frontend
+npm test
+
+# Integration tests
+docker-compose -f docker-compose.test.yml up --abort-on-container-exit
+```
+
+## Contributing
+
+See CONTRIBUTING.md for development workflow.
+
+## License
+
+MIT License - see LICENSE file.
