@@ -1,9 +1,0 @@
-Document content:
-{{content}}
-
-Please provide a comprehensive summary of this document, including:
-1. Main topic and purpose
-2. Key points and findings
-3. Important details or conclusions
-
-Summary:

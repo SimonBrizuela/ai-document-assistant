@@ -1,43 +1,21 @@
-# Environment variables
-.env
-.env.local
-.env.*.local
+# Roblox
+*.rbxl
+*.rbxlx
+*.rbxm
+*.rbxmx
+
+# OS
+.DS_Store
+Thumbs.db
 
 # IDEs
-.idea/
 .vscode/
-*.swp
-*.swo
-*~
-.DS_Store
+.idea/
+*.sublime-*
 
-# Dependencies
-node_modules/
-target/
-build/
-dist/
-
-# Logs
-*.log
-logs/
-
-# Database
-*.db
-*.sqlite
-
-# Terraform
-.terraform/
-*.tfstate
-*.tfstate.*
-.terraform.lock.hcl
-
-# Docker
-*.pid
-
-# Testing
-coverage/
-.nyc_output/
+# Rojo
+*.project.json
 
 # Temporary files
-tmp_rovodev_*
-*.tmp
+tmp_*
+temp_*
